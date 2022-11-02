@@ -22,12 +22,12 @@ var neuronios, neuroniosImg, fundo2, fundo2Img
 
 
 //variaveis gerais
-var contador = 30;
+var contador = 130;
 var contadorDisplay;
 var vitoriaText
 var perdeuText
 var mercurioImg, mercurioGroup;
-
+var telaW, telaH
 function preload() {
   apresentacaoImg = loadImage("./assets/apresentacao.png")
   fundo1Img = loadImage("./assets/fundo1.png")
@@ -40,25 +40,39 @@ function preload() {
 function setup() {
 
   //  CONFIGS INICIAIS
-  createCanvas(400, 400)
-
-  apresentacao = createSprite(200, 200, 50, 50)
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(isMobile){
+    telaW = displayWidth; 
+    telaH = displayHeight; 
+    createCanvas(displayWidth+80, displayHeight);
+  } 
+  else {
+    telaW = windowWidth; 
+    telaH = windowHeight; 
+    createCanvas(windowWidth, windowHeight);
+  }
+  telaH = windowHeight
+  telaW = windowWidth
+  apresentacao = createSprite(telaW /2 , telaH /2, 50, 50)
    apresentacao.addImage(apresentacaoImg);
- apresentacao.scale = 0.92;
+   apresentacao.scale = 2;
 
    btnInicial = createButton("Continuar");
-   btnInicial.position(160, 210)
+   btnInicial.position(telaW /2 - 100 , telaH /2)
    btnInicial.class("botaoinicial")
 
   btn1 = createButton("Desvie do mercúrio");
-  btn1.position(30, 180)
+  btn1.position(telaW /2 - 300 , telaH /2)
+  btn1.size(150, 150)
   btn1.hide();
   btn2 = createButton("Salve os neurônios");
-  btn2.position(250, 180)
+  btn2.position(telaW /2 + 200, telaH /2)
+  btn2.size(150, 150)
   btn2.hide();
 
   btn3 = createButton("Continuar");
-  btn3.position(150, 180)
+  btn3.position(telaW /2 - 200 , telaH /2 + 300)
+  btn3.size(150, 150)
   btn3.hide();
 
   btn4 = createButton("Continuar");
@@ -74,9 +88,9 @@ function setup() {
   btn6.hide();
 
 
-  contadorDisplay = createElement("h3")
-  perdeuText = createElement("h3")
-  vitoriaText = createElement("h3")
+  contadorDisplay = createElement("h1")
+  perdeuText = createElement("h1")
+  vitoriaText = createElement("h1")
 
   check1 = createImg("./assets/check.png")
   check1.size(80, 80);
@@ -90,31 +104,31 @@ function setup() {
 
   mercurioGroup = new Group();
 
-  finalText = createElement("h3")
+  finalText = createElement("h1")
   finalText.position(100, 50)
  
 
   // CONFIGS DO JOGO1
   regras1 = createElement("h7");
 
-  fundo1 = createSprite(200, 200, 400, 400);
+  fundo1 = createSprite(telaW /2 , telaH /2, 400, 400);
   fundo1.addImage(fundo1Img);
-  fundo1.scale = 1.5
+  fundo1.scale = 3
   fundo1.visible = false;
 
-  peixe = createSprite(70, 180, 50, 50);
+  peixe = createSprite(telaW /2 - 300 , telaH /2 + 300, 50, 50);
   peixe.visible = false;
   peixe.addImage(peixeImg)
-  peixe.scale = 0.02
+  peixe.scale = 0.05
 
   topArrow = createImg("./assets/top.png")
-  topArrow.size(50, 50)
-  topArrow.position(15, 340)
+  topArrow.size(150, 150)
+  topArrow.position(telaW /2 - 300 , telaH /2 + 600)
   topArrow.hide()
 
   downArrow = createImg("./assets/down.png")
-  downArrow.size(40, 50)
-  downArrow.position(350, 340)
+  downArrow.size(140, 150)
+  downArrow.position(telaW /2 + 200 , telaH /2 + 600)
   downArrow.hide()
 
   // CONFIGS DO JOGO2
@@ -221,7 +235,8 @@ function prejogo1() {
   background(250)
 
   regras1.html("sobreviva 30 segundos desviando do mercurio, você se pode mover para cima e para baixo para desviar, clique para continuar");
-  regras1.position(100, 50)
+  regras1.position(telaW /2 -200 , telaH /2 - 300)
+  regras1.size(350,350)
   regras1.class("regras");
 
   btn3.mouseClicked(() => {
@@ -256,18 +271,22 @@ function jogo1() {
   downArrow.show();
 
   topArrow.mouseClicked(() => {
-    peixe.y = peixe.y - 8.5;
+    if (peixe.y > telaH /2 ) {
+      peixe.y = peixe.y - 50.5;
+    }
   })
 
   downArrow.mouseClicked(() => {
-    peixe.y = peixe.y + 8.5;
+    if ( peixe.y < telaH /2 + 580 ) {
+      peixe.y = peixe.y + 50.5;
+    }
   })
 
-  if (keyDown("up") && peixe.y > 200) {
-    peixe.y = peixe.y - 2.5;
+  if (keyDown("up") && peixe.y > telaH /2 ) {
+    peixe.y = peixe.y - 5.5;
   }
-  if (keyDown("down") && peixe.y < 375) {
-    peixe.y = peixe.y + 2.5;
+  if (keyDown("down") && peixe.y < telaH /2 + 580 ) {
+    peixe.y = peixe.y + 5.5;
   }
 
   geradorMercurio();
@@ -282,13 +301,13 @@ function jogo1() {
 
 function geradorMercurio() {
   if (frameCount % 50 == 0) {
-    mercurio = createSprite(400, 200, 30, 30);
-    mercurio.velocityX = -4;
-    mercurio.y = Math.round(random(200, 375))
+    mercurio = createSprite(telaW /2 + 500 , telaH /2, 30, 30);
+    mercurio.velocityX = -5;
+    mercurio.y = Math.round(random(telaH /2 , telaH /2 + 580))
     mercurio.addImage(mercurioImg);
-    mercurio.scale = 0.3
+    mercurio.scale = 0.6
     mercurio.setCollider("circle", 0, 0, 55)
-    mercurio.lifetime = 400 / 4 + 7
+    mercurio.lifetime = 800 / 5 + 50
     mercurioGroup.add(mercurio)
   }
 }
@@ -296,7 +315,7 @@ function geradorMercurio() {
 function tempo() {
   contadorDisplay.show();
   contadorDisplay.html(Math.floor(contador).toFixed(1));
-  contadorDisplay.position(160, -20);
+  contadorDisplay.position(telaW /2 - 100 , telaH /2 - 290);
   contadorDisplay.class("contador");
   // contadorDisplay.show();
   contador -= 0.06
